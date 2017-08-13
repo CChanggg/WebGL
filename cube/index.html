@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=ca, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Three.js 立方体</title>
+</head>
+
+<body>
+    <canvas id="webglcanvas" width="500" height="500" style="border:none;background-color:#000;margin:0 auto;display:block;">
+
+    </canvas>
+    <script src="http://cdn.bootcss.com/three.js/r56/three.min.js"></script>
+    <script>
+        // 相机，
+        // 灯光，
+        // 场景，
+        // group，
+        // 角色  模型+纹理
+        // renderer
+        let renderer = null,
+            scene = null,
+            camera = null,
+            cube = null; //元素
+        window.onload = function() {
+            let canvas = document.getElementById('webglcanvas');
+            renderer = new THREE.WebGLRenderer({
+                canvas: canvas, //才有canvas的渲染方式
+                antialias: true
+            });
+            renderer.setSize(canvas.width, canvas.height);
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, canvas.width / canvas.height, 1, 4000);
+            scene.add(camera); //场景里相机就位
+            //构建主角 形状 材质
+            var light = new THREE.DirectionalLight(0x123456, 6); //方向光源 
+            light.position.set(1, 1, 1); //z轴方向为1
+            scene.add(light);
+            let pointLight = new THREE.PointLight(0x0000ff, 1, 20); //点光源
+            pointLight.position.set(-5, 2, -10);
+            scene.add(pointLight);
+            let spotLight = new THREE.SpotLight(0x00ff00); //聚光灯
+            spotLight.position.set(2, 2, 5);
+            spotLight.target.position.set(2, 0, 4);
+            scene.add(spotLight);
+            let ambientLight = new THREE.AmbientLight(0x888888); //环境光
+            scene.add(ambientLight);
+            let mapUrl = './1.jpg';
+            let map = THREE.ImageUtils.loadTexture(mapUrl); //图片载入 生成材质 就是贴图
+            let material = new THREE.MeshPhongMaterial({
+                map: map
+            });
+            let geometry = new THREE.CubeGeometry(2, 2, 2) //立方体大小
+            cube = new THREE.Mesh(geometry, material);
+            cube.position.z = -8;
+            cube.position.x = Math.PI / 5; //立方体产生一点旋转
+            cube.position.y = Math.PI / 5;
+            scene.add(cube);
+            run();
+            // renderer.render(scene, camera);
+        }
+
+        function run() {
+            requestAnimationFrame(function() {
+                run();
+            })
+            renderer.render(scene, camera);
+            animate();
+        }
+        let duration = 5000;
+        let currentTime = Date.now();
+
+        function animate() {
+            let now = Date.now();
+            let deltat = now - currentTime;
+            currentTime = now;
+            let fract = deltat / duration;
+            let angel = Math.PI * 2 * fract;
+            cube.rotation.y += angel;
+            // cube.rotation.x += angel;
+        }
+    </script>
+</body>
+
+</html>
